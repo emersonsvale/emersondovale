@@ -25,7 +25,7 @@ RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nuxtjs
 
 # Copy package files
-COPY package*.json ./
+COPY package.json package-lock.json ./
 
 # Install only production dependencies
 RUN npm ci --only=production && npm cache clean --force
