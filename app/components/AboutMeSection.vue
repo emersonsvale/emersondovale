@@ -16,12 +16,21 @@
       class="relative z-10 mx-auto max-w-2xl px-6 text-center"
       :style="{ transform: `translateY(${textParallaxY}px)` }"
     >
-      <h2
-        id="about-me-title"
-        class="text-3xl font-bold uppercase tracking-tight text-[#c9a962] sm:text-4xl md:text-5xl"
+      <div
+        ref="headerRef"
+        class="flex flex-col items-center justify-center max-w-[540px] mx-auto about-me-header"
       >
-        {{ title }}
-      </h2>
+        <div class="flex justify-center">
+          <div class="border border-neutral-800/60 py-1 px-4 rounded-lg text-neutral-400">About Me</div>
+        </div>
+
+        <h2
+          id="about-me-title"
+          class="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tighter mt-5 text-[#c9a962]"
+        >
+          {{ title }}
+        </h2>
+      </div>
 
       <div class="mt-6 space-y-4 text-base leading-relaxed text-neutral-400 md:text-lg">
         <p
@@ -32,9 +41,9 @@
         </p>
       </div>
 
-      <template v-if="domainItems.length > 0">
+      <template v-if="domainItems && domainItems.length > 0">
         <p class="mt-8 text-sm font-medium uppercase tracking-wider text-[#c9a962]">
-          Especialista em:
+          Specialist in:
         </p>
         <ul class="mx-auto mt-3 max-w-lg list-none space-y-2 text-center text-sm text-neutral-400 md:text-base">
           <li
@@ -67,6 +76,7 @@
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 
 const sectionRef = ref<HTMLElement | null>(null)
+const headerRef = ref<HTMLElement | null>(null)
 const textParallaxY = ref(0)
 
 let ticking = false
@@ -94,17 +104,10 @@ const props = withDefaults(
     contactHref?: string
   }>(),
   {
-    title: 'ABOUT ME',
+    title: 'Who I am',
     description:
-      'Lead Developer Sênior com experiência sólida no desenvolvimento de aplicativos Android e iOS, especializado em FlutterFlow, Supabase, Bubble, Xano e n8n. Atuo como líder técnico na Fraktal Software e fundei a Vale Apps, onde entrego SaaS escaláveis com integrações via API, automação de processos e foco em performance.\n\nJá participei de projetos para fintechs, clínicas, e-commerces e ferramentas internas de produtividade. Gosto de resolver problemas com soluções enxutas, escaláveis e que entregam resultado real. Sempre atual com as melhores práticas de mercado.',
-    domainItems: () => [
-      'Desenvolvimento de Aplicativos Mobile e Web',
-      'Plataforma Android, Android Studio, Aplicativos para Android',
-      'Objective-C, Java, API REST, Firebase',
-      'Criação de sistemas com autenticação, pagamentos, notificações push, manutenção evolutiva e UX otimizada',
-      'Stack com Supabase Realtime, Auth, Edge Functions, Xano, HTTP Requests e integração com sistemas legados',
-    ],
-    contactLabel: 'FALE COMIGO',
+      'I am a senior developer focused on building solid, scalable, and easy-to-maintain digital products. I currently work as a lead developer at Fraktal Software and I am also the founder of Vale Apps, where I create SaaS solutions with API integrations, process automation, and growth-oriented architectures.\n\nI have hands-on experience in projects for fintechs, healthcare clinics, e-commerce platforms, and internal systems, participating from early planning to production delivery. I enjoy working on simple, well-structured solutions that truly solve business problems, without adding unnecessary complexity.\n\nIn my daily work, I mainly develop mobile and web applications, build systems with authentication, payments, notifications, and integrations, and design scalable backends using Supabase.',
+    contactLabel: 'GET IN TOUCH',
     contactHref: '#contact',
   }
 )
@@ -116,9 +119,37 @@ const descriptionParagraphs = computed(() =>
 onMounted(() => {
   updateParallax()
   window.addEventListener('scroll', onScroll, { passive: true })
+  
+  if (headerRef.value) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('about-me-header-visible')
+          }
+        })
+      },
+      { threshold: 0.1 }
+    )
+    observer.observe(headerRef.value)
+  }
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', onScroll)
 })
 </script>
+
+<style scoped>
+.about-me-header {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+  transition-delay: 0.1s;
+}
+
+.about-me-header-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
