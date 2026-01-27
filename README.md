@@ -1,23 +1,13 @@
-# Nuxt Minimal Starter
+# Portfólio Emerson
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Portfólio pessoal desenvolvido com Nuxt 4, Tailwind CSS e TypeScript.
 
 ## Setup
 
 Make sure to install dependencies:
 
 ```bash
-# npm
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
 ## Development Server
@@ -25,17 +15,7 @@ bun install
 Start the development server on `http://localhost:3000`:
 
 ```bash
-# npm
 npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
 ## Production
@@ -43,33 +23,58 @@ bun run dev
 Build the application for production:
 
 ```bash
-# npm
 npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
 ```
 
 Locally preview production build:
 
 ```bash
-# npm
 npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+## Deploy no Coolify
+
+### Pré-requisitos
+
+1. Repositório no GitHub/GitLab
+2. Coolify instalado e configurado na sua VPS
+3. Domínio configurado (opcional)
+
+### Passos para Deploy
+
+1. **Configure as variáveis de ambiente no Coolify:**
+   - `ADMIN_EMAIL`: Email do administrador
+   - `ADMIN_PASSWORD`: Senha do administrador
+   - `NODE_ENV`: `production`
+
+2. **No Coolify:**
+   - Crie um novo projeto
+   - Conecte seu repositório Git
+   - O Coolify detectará automaticamente o Dockerfile
+   - Configure o domínio (se aplicável)
+   - Defina as variáveis de ambiente
+   - Inicie o deploy
+
+3. **O Coolify irá:**
+   - Fazer build da imagem Docker
+   - Executar o container
+   - Expor a aplicação na porta configurada
+
+### Variáveis de Ambiente
+
+Copie o arquivo `.env.example` e configure as seguintes variáveis:
+
+- `ADMIN_EMAIL`: Email para login no painel admin
+- `ADMIN_PASSWORD`: Senha para login no painel admin
+- `NODE_ENV`: Ambiente (production)
+- `PORT`: Porta do servidor (geralmente 3000, configurado pelo Coolify)
+
+### Estrutura do Projeto
+
+- `/app`: Código fonte da aplicação
+- `/server`: APIs e rotas do servidor
+- `/data`: Arquivos JSON com dados (projetos e depoimentos)
+- `/public`: Arquivos estáticos
+- `/shared`: Tipos TypeScript compartilhados
+
+Check out the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) for more information.
