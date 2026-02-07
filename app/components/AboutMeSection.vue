@@ -11,69 +11,84 @@
       aria-hidden="true"
     />
 
-    <!-- Conteúdo principal — parallax -->
+    <!-- Layout: imagem à esquerda, texto à direita -->
     <div
-      class="relative z-10 mx-auto max-w-2xl px-6 text-center"
+      class="relative z-10 mx-auto flex max-w-6xl flex-col items-center gap-10 px-6 md:flex-row md:items-center md:gap-12 lg:gap-16"
       :style="{ transform: `translateY(${textParallaxY}px)` }"
     >
-      <div
-        ref="headerRef"
-        class="flex flex-col items-center justify-center max-w-[540px] mx-auto about-me-header"
-      >
-        <div class="flex justify-center">
-          <div class="border border-neutral-800/60 py-1 px-4 rounded-lg text-neutral-400">About Me</div>
+      <!-- Foto à esquerda -->
+      <div class="flex-shrink-0 md:w-[min(320px,40%)]">
+        <img
+          src="/image%20(2).png"
+          alt="Emerson Vale - Software Engineer"
+          class="w-full rounded-xl object-cover border-0"
+          width="320"
+          height="400"
+          loading="lazy"
+        />
+      </div>
+
+      <!-- Conteúdo principal (texto à direita) -->
+      <div class="flex min-w-0 flex-1 flex-col text-center md:text-left">
+        <div
+          ref="headerRef"
+          class="flex flex-col items-center md:items-start about-me-header"
+        >
+          <div class="flex justify-center md:justify-start">
+            <div class="border border-neutral-800/60 py-1 px-4 rounded-lg text-neutral-400">About Me</div>
+          </div>
+
+          <h2
+            id="about-me-title"
+            class="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tighter mt-5 text-[#c9a962]"
+          >
+            {{ title }}
+          </h2>
         </div>
 
-        <h2
-          id="about-me-title"
-          class="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tighter mt-5 text-[#c9a962]"
-        >
-          {{ title }}
-        </h2>
-      </div>
-
-      <div class="mt-6 space-y-4 text-base leading-relaxed text-neutral-400 md:text-lg">
-        <p
-          v-for="(paragraph, i) in descriptionParagraphs"
-          :key="i"
-        >
-          {{ paragraph }}
-        </p>
-      </div>
-
-      <template v-if="domainItems && domainItems.length > 0">
-        <p class="mt-8 text-sm font-medium uppercase tracking-wider text-[#c9a962]">
-          Specialist in:
-        </p>
-        <ul class="mx-auto mt-3 max-w-lg list-none space-y-2 text-center text-sm text-neutral-400 md:text-base">
-          <li
-            v-for="(item, i) in domainItems"
+        <div class="mt-6 space-y-4 text-base leading-relaxed text-neutral-400 md:text-lg">
+          <p
+            v-for="(paragraph, i) in descriptionParagraphs"
             :key="i"
           >
-            {{ item }}
-          </li>
-        </ul>
-      </template>
+            {{ paragraph }}
+          </p>
+        </div>
 
-      <div class="mt-10">
-        <a
-          :href="contactHref"
-          class="inline-flex items-center justify-center rounded-full bg-[#c9a962] px-8 py-3 text-sm font-medium text-[#0a0a0a] transition hover:bg-[#d4b96d]"
-        >
-          {{ contactLabel }}
-        </a>
-      </div>
+        <template v-if="domainItems && domainItems.length > 0">
+          <p class="mt-8 text-sm font-medium uppercase tracking-wider text-[#c9a962]">
+            Specialist in:
+          </p>
+          <ul class="mt-3 max-w-lg list-none space-y-2 text-center text-sm text-neutral-400 md:text-left md:text-base">
+            <li
+              v-for="(item, i) in domainItems"
+              :key="i"
+            >
+              {{ item }}
+            </li>
+          </ul>
+        </template>
 
-      <!-- Slot para conteúdo extra (links, badges, etc.) -->
-      <div v-if="$slots.extra" class="mt-8">
-        <slot name="extra" />
+        <div class="mt-10 flex justify-center md:justify-start">
+          <a
+            :href="contactHref"
+            class="inline-flex items-center justify-center rounded-full bg-[#c9a962] px-8 py-3 text-sm font-medium text-[#0a0a0a] transition hover:bg-[#d4b96d]"
+          >
+            {{ contactLabel }}
+          </a>
+        </div>
+
+        <!-- Slot para conteúdo extra (links, badges, etc.) -->
+        <div v-if="$slots.extra" class="mt-8">
+          <slot name="extra" />
+        </div>
       </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted, nextTick } from 'vue'
 
 const sectionRef = ref<HTMLElement | null>(null)
 const headerRef = ref<HTMLElement | null>(null)
@@ -93,6 +108,16 @@ function onScroll() {
     requestAnimationFrame(updateParallax)
     ticking = true
   }
+}
+
+function setHeaderVisible(el: HTMLElement) {
+  el.classList.add('about-me-header-visible')
+}
+
+function isInViewport(el: HTMLElement): boolean {
+  const rect = el.getBoundingClientRect()
+  const vh = window.innerHeight || document.documentElement.clientHeight
+  return rect.top < vh * 0.85 && rect.bottom > 0
 }
 
 const props = withDefaults(
@@ -119,20 +144,27 @@ const descriptionParagraphs = computed(() =>
 onMounted(() => {
   updateParallax()
   window.addEventListener('scroll', onScroll, { passive: true })
-  
-  if (headerRef.value) {
+
+  nextTick(() => {
+    const header = headerRef.value
+    if (!header) return
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add('about-me-header-visible')
+            setHeaderVisible(entry.target as HTMLElement)
           }
         })
       },
-      { threshold: 0.1 }
+      { threshold: 0.05, rootMargin: '0px 0px -10% 0px' }
     )
-    observer.observe(headerRef.value)
-  }
+    observer.observe(header)
+
+    if (isInViewport(header)) {
+      setHeaderVisible(header)
+    }
+  })
 })
 
 onUnmounted(() => {

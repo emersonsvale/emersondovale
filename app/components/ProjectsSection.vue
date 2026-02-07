@@ -47,12 +47,13 @@
         v-else-if="projectsList && projectsList.length > 0"
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
       >
-        <NuxtLink
+        <component
+          :is="getProjectLinkTag(project)"
           v-for="(project, index) in projectsList"
           :key="project.id"
-          :to="`/projects/${project.slug}`"
+          v-bind="getProjectLinkProps(project)"
           :class="getBentoClass(index)"
-          class="group relative overflow-hidden rounded-xl bg-[#1a1a1a] border border-[#2a2a2a] hover:border-[#c9a962]/50 transition-all duration-300 hover:scale-[1.02]"
+          class="group relative overflow-hidden rounded-xl bg-[#1a1a1a] border border-[#2a2a2a] hover:border-[#c9a962]/50 transition-all duration-300 hover:scale-[1.02] block"
         >
           <!-- Imagem de fundo -->
           <div
@@ -98,7 +99,7 @@
               <ArrowRight class="ml-2 size-4 transition-transform group-hover:translate-x-1" />
             </div>
           </div>
-        </NuxtLink>
+        </component>
       </div>
 
     </div>
@@ -154,6 +155,22 @@ onMounted(() => {
     observer.observe(headerRef.value)
   }
 })
+
+// Se o projeto tem live_url, abre o link externo; senão, vai para a página do projeto
+function getProjectLinkTag(project: Project): 'a' | typeof NuxtLink {
+  return project.live_url ? 'a' : NuxtLink
+}
+
+function getProjectLinkProps(project: Project): Record<string, string> {
+  if (project.live_url) {
+    return {
+      href: project.live_url,
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    }
+  }
+  return { to: `/projects/${project.slug}` }
+}
 
 // Função para determinar classes do bento grid (diferentes tamanhos)
 function getBentoClass(index: number): string {

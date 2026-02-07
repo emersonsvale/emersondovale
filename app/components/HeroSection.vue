@@ -120,8 +120,8 @@
               </svg>
             </a>
             <a
-              href="/cv.pdf"
-              download="Emerson-Vale-CV.pdf"
+              href="/Emerson_Vale_-_Software_Engineer.pdf"
+              download="Emerson-Vale-Software-Engineer.pdf"
               class="inline-flex h-10 shrink-0 items-center gap-2 rounded-full bg-[#c9a962] px-4 text-sm font-medium text-[#0a0a0a] transition hover:bg-[#d4b96d]"
               aria-label="Download CV"
             >

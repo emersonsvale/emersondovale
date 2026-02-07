@@ -1,1 +1,24 @@
-[]
+[
+  {
+    "id": "1",
+    "title": "Sistema de Gestão de Portfólio",
+    "description": "Plataforma moderna e responsiva desenvolvida com Nuxt 3 para exibição de projetos profissionais, com painel administrativo completo e integração com APIs RESTful.",
+    "slug": "sistema-gestao-portfolio",
+    "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=800&fit=crop",
+    "category": "Web App",
+    "featured": true,
+    "content": "## Sobre o Projeto\n\nEste projeto foi desenvolvido para demonstrar habilidades em desenvolvimento full-stack, utilizando as mais modernas tecnologias do ecossistema JavaScript.\n\n### Principais Funcionalidades\n\n- **Interface Responsiva**: Design adaptável para todos os dispositivos\n- **Painel Administrativo**: Sistema completo de gerenciamento de conteúdo\n- **Performance Otimizada**: Carregamento rápido e SEO otimizado\n- **TypeScript**: Código type-safe e mais manutenível\n\n### Desafios e Soluções\n\nDurante o desenvolvimento, enfrentamos desafios relacionados à otimização de performance e experiência do usuário. Implementamos lazy loading de imagens, code splitting e cache estratégico para garantir uma experiência fluida.\n\n### Tecnologias Utilizadas\n\nO projeto utiliza uma stack moderna focada em produtividade e escalabilidade, garantindo que o código seja fácil de manter e evoluir.",
+    "technologies": [
+      "Nuxt 3",
+      "TypeScript",
+      "Tailwind CSS",
+      "Vue 3",
+      "Node.js",
+      "RESTful API"
+    ],
+    "github_url": "https://github.com/emersonsvale/portfolio",
+    "live_url": "https://emersonsvale.dev",
+    "created_at": "2025-01-15T10:00:00.000Z",
+    "updated_at": "2025-01-27T20:00:00.000Z"
+  }
+]
