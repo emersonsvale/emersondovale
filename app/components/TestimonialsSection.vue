@@ -1,23 +1,30 @@
 <template>
-  <section class="bg-[#0a0a0a] my-20 relative">
-    <div class="container z-10 mx-auto">
+  <section
+    ref="sectionRef"
+    class="bg-[var(--c-bg)] py-20 md:py-32 relative overflow-hidden"
+  >
+    <!-- Subtle background glow -->
+    <div
+      class="absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_50%_30%,rgba(201,169,98,0.04)_0%,transparent_70%)]"
+      aria-hidden="true"
+    />
+
+    <div class="container z-10 mx-auto relative">
       <div
         ref="headerRef"
-        class="flex flex-col items-center justify-center max-w-[540px] mx-auto testimonials-header"
+        class="reveal flex flex-col items-center justify-center max-w-[540px] mx-auto"
       >
-        <div class="flex justify-center">
-          <div class="border border-neutral-800/60 py-1 px-4 rounded-lg text-neutral-400">Testimonials</div>
-        </div>
+        <div class="section-label">Testimonials</div>
 
-        <h2 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tighter mt-5 text-[#c9a962]">
-          What our users say
+        <h2 class="section-heading mt-4 text-center">
+          What people say
         </h2>
-        <p class="text-center mt-5 opacity-75 text-neutral-400">
-          See what our customers have to say about us.
+        <p class="text-center mt-4 text-[var(--c-text-secondary)] text-[15px] leading-relaxed max-w-md">
+          Feedback from clients and colleagues I've had the pleasure of working with.
         </p>
       </div>
 
-      <div class="flex justify-center gap-6 mt-10 [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)] max-h-[740px] overflow-hidden">
+      <div class="flex justify-center gap-6 mt-14 [mask-image:linear-gradient(to_bottom,transparent,black_20%,black_80%,transparent)] max-h-[740px] overflow-hidden">
         <TestimonialsColumn :testimonials="firstColumn" :duration="15" />
         <TestimonialsColumn :testimonials="secondColumn" class="hidden md:block" :duration="19" />
         <TestimonialsColumn :testimonials="thirdColumn" class="hidden lg:block" :duration="17" />
@@ -27,10 +34,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import TestimonialsColumn from './ui/TestimonialsColumn.vue'
 import { useTestimonials } from '../composables/useTestimonials'
 
+const sectionRef = ref<HTMLElement | null>(null)
 const headerRef = ref<HTMLElement | null>(null)
 const { testimonials, fetchTestimonials } = useTestimonials()
 
@@ -38,35 +46,26 @@ const firstColumn = computed(() => testimonials.value.slice(0, 3))
 const secondColumn = computed(() => testimonials.value.slice(3, 6))
 const thirdColumn = computed(() => testimonials.value.slice(6, 9))
 
+function setupObserver() {
+  const elements = sectionRef.value?.querySelectorAll('.reveal')
+  if (!elements) return
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed')
+        }
+      })
+    },
+    { threshold: 0.1 }
+  )
+
+  elements.forEach((el) => observer.observe(el))
+}
+
 onMounted(async () => {
   await fetchTestimonials()
-  
-  if (headerRef.value) {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('testimonials-header-visible')
-          }
-        })
-      },
-      { threshold: 0.1 }
-    )
-    observer.observe(headerRef.value)
-  }
+  nextTick(() => setupObserver())
 })
 </script>
-
-<style scoped>
-.testimonials-header {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
-  transition-delay: 0.1s;
-}
-
-.testimonials-header-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-</style>

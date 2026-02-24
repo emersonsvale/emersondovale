@@ -45,6 +45,8 @@ npm run preview
 1. **Configure as variáveis de ambiente no Coolify:**
    - `ADMIN_EMAIL`: Email do administrador
    - `ADMIN_PASSWORD`: Senha do administrador
+   - `SUPABASE_URL`: URL do projeto Supabase
+   - `SUPABASE_SERVICE_ROLE_KEY`: Chave service role do Supabase
    - `NODE_ENV`: `production`
 
 2. **No Coolify:**
@@ -66,6 +68,8 @@ Copie o arquivo `.env.example` e configure as seguintes variáveis:
 
 - `ADMIN_EMAIL`: Email para login no painel admin
 - `ADMIN_PASSWORD`: Senha para login no painel admin
+- `SUPABASE_URL`: URL do projeto Supabase
+- `SUPABASE_SERVICE_ROLE_KEY`: Chave service role do Supabase
 - `NODE_ENV`: Ambiente (production)
 - `PORT`: Porta do servidor (geralmente 3000, configurado pelo Coolify)
 

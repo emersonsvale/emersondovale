@@ -8,8 +8,9 @@ export interface Project {
   featured?: boolean
   content?: string | null
   technologies?: string[] | null
-  github_url?: string | null
-  live_url?: string | null
+  link_web?: string | null
+  link_google?: string | null
+  link_apple?: string | null
   created_at?: string
   updated_at?: string
 }
@@ -23,8 +24,9 @@ export interface ProjectInsert {
   featured?: boolean
   content?: string | null
   technologies?: string[] | null
-  github_url?: string | null
-  live_url?: string | null
+  link_web?: string | null
+  link_google?: string | null
+  link_apple?: string | null
 }
 
 export interface ProjectUpdate {
@@ -36,6 +38,7 @@ export interface ProjectUpdate {
   featured?: boolean
   content?: string | null
   technologies?: string[] | null
-  github_url?: string | null
-  live_url?: string | null
+  link_web?: string | null
+  link_google?: string | null
+  link_apple?: string | null
 }

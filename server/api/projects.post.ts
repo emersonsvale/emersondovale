@@ -1,6 +1,10 @@
-import { readFile, writeFile } from 'fs/promises'
-import { join } from 'path'
 import type { Project, ProjectInsert } from '../../../shared/types/Project'
+import {
+  mapProjectInsertToSupabaseProjeto,
+  mapSupabaseProjetoToProject,
+  type SupabaseProjetoRow,
+} from '../utils/projectMapper'
+import { getSupabaseServerClient } from '../utils/supabase'
 import { requireAuth } from '../utils/auth'
 
 export default defineEventHandler(async (event): Promise<Project> => {
@@ -18,32 +22,43 @@ export default defineEventHandler(async (event): Promise<Project> => {
       })
     }
 
-    const filePath = join(process.cwd(), 'data', 'projects.json')
-    const fileContent = await readFile(filePath, 'utf-8')
-    const projects: Project[] = JSON.parse(fileContent)
+    const supabase = getSupabaseServerClient(event)
 
-    // Verifica se o slug já existe
-    if (projects.some((p) => p.slug === body.slug)) {
+    const { data: existingProject, error: existingProjectError } = await supabase
+      .from('projetos')
+      .select('id')
+      .eq('slug', body.slug)
+      .maybeSingle()
+
+    if (existingProjectError) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: `Erro ao validar slug no Supabase: ${existingProjectError.message}`,
+      })
+    }
+
+    if (existingProject) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Já existe um projeto com este slug',
       })
     }
 
-    // Cria novo projeto
-    const newProject: Project = {
-      id: Date.now().toString(),
-      ...body,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+    const payload = mapProjectInsertToSupabaseProjeto(body)
+    const { data, error } = await supabase
+      .from('projetos')
+      .insert(payload)
+      .select('*')
+      .single()
+
+    if (error || !data) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: `Erro ao criar projeto no Supabase: ${error?.message || 'sem retorno de dados'}`,
+      })
     }
 
-    projects.push(newProject)
-
-    // Salva no arquivo
-    await writeFile(filePath, JSON.stringify(projects, null, 2), 'utf-8')
-
-    return newProject
+    return mapSupabaseProjetoToProject(data as SupabaseProjetoRow)
   } catch (error) {
     if (error && typeof error === 'object' && 'statusCode' in error) {
       throw error

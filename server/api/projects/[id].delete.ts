@@ -1,6 +1,4 @@
-import { readFile, writeFile } from 'fs/promises'
-import { join } from 'path'
-import type { Project } from '../../../../shared/types/Project'
+import { getSupabaseServerClient } from '../../utils/supabase'
 import { requireAuth } from '../../utils/auth'
 
 export default defineEventHandler(async (event): Promise<{ success: boolean }> => {
@@ -16,23 +14,38 @@ export default defineEventHandler(async (event): Promise<{ success: boolean }> =
       })
     }
 
-    const filePath = join(process.cwd(), 'data', 'projects.json')
-    const fileContent = await readFile(filePath, 'utf-8')
-    const projects: Project[] = JSON.parse(fileContent)
+    const supabase = getSupabaseServerClient(event)
+    const { data: existingProject, error: existingProjectError } = await supabase
+      .from('projetos')
+      .select('id')
+      .eq('id', Number(id))
+      .maybeSingle()
 
-    const projectIndex = projects.findIndex((p) => p.id === id)
-    if (projectIndex === -1) {
+    if (existingProjectError) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: `Erro ao buscar projeto no Supabase: ${existingProjectError.message}`,
+      })
+    }
+
+    if (!existingProject) {
       throw createError({
         statusCode: 404,
         statusMessage: 'Projeto não encontrado',
       })
     }
 
-    // Remove o projeto
-    projects.splice(projectIndex, 1)
+    const { error } = await supabase
+      .from('projetos')
+      .delete()
+      .eq('id', Number(id))
 
-    // Salva no arquivo
-    await writeFile(filePath, JSON.stringify(projects, null, 2), 'utf-8')
+    if (error) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: `Erro ao deletar projeto no Supabase: ${error.message}`,
+      })
+    }
 
     return { success: true }
   } catch (error) {

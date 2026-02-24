@@ -10,10 +10,13 @@ export const useProjects = () => {
     error.value = null
 
     try {
-      const response = await $fetch<Project[]>('/api/projects')
+      const response = await $fetch<Project[]>('/api/projects', {
+        timeout: 15000,
+      })
       projects.value = response
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Erro ao carregar projetos'
+      projects.value = []
       console.error('Erro ao buscar projetos:', err)
     } finally {
       loading.value = false

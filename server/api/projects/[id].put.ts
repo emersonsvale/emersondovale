@@ -1,6 +1,10 @@
-import { readFile, writeFile } from 'fs/promises'
-import { join } from 'path'
 import type { Project, ProjectUpdate } from '../../../../shared/types/Project'
+import {
+  mapProjectUpdateToSupabaseProjeto,
+  mapSupabaseProjetoToProject,
+  type SupabaseProjetoRow,
+} from '../../utils/projectMapper'
+import { getSupabaseServerClient } from '../../utils/supabase'
 import { requireAuth } from '../../utils/auth'
 
 export default defineEventHandler(async (event): Promise<Project> => {
@@ -17,21 +21,44 @@ export default defineEventHandler(async (event): Promise<Project> => {
     }
 
     const body = await readBody<ProjectUpdate>(event)
-    const filePath = join(process.cwd(), 'data', 'projects.json')
-    const fileContent = await readFile(filePath, 'utf-8')
-    const projects: Project[] = JSON.parse(fileContent)
+    const supabase = getSupabaseServerClient(event)
 
-    const projectIndex = projects.findIndex((p) => p.id === id)
-    if (projectIndex === -1) {
+    const { data: currentProject, error: currentProjectError } = await supabase
+      .from('projetos')
+      .select('*')
+      .eq('id', Number(id))
+      .maybeSingle()
+
+    if (currentProjectError) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: `Erro ao buscar projeto no Supabase: ${currentProjectError.message}`,
+      })
+    }
+
+    if (!currentProject) {
       throw createError({
         statusCode: 404,
         statusMessage: 'Projeto não encontrado',
       })
     }
 
-    // Verifica se o slug está sendo alterado e se já existe
-    if (body.slug && body.slug !== projects[projectIndex].slug) {
-      if (projects.some((p) => p.slug === body.slug && p.id !== id)) {
+    if (body.slug && body.slug !== currentProject.slug) {
+      const { data: slugInUse, error: slugCheckError } = await supabase
+        .from('projetos')
+        .select('id')
+        .eq('slug', body.slug)
+        .neq('id', Number(id))
+        .maybeSingle()
+
+      if (slugCheckError) {
+        throw createError({
+          statusCode: 500,
+          statusMessage: `Erro ao validar slug no Supabase: ${slugCheckError.message}`,
+        })
+      }
+
+      if (slugInUse) {
         throw createError({
           statusCode: 400,
           statusMessage: 'Já existe um projeto com este slug',
@@ -39,19 +66,22 @@ export default defineEventHandler(async (event): Promise<Project> => {
       }
     }
 
-    // Atualiza o projeto
-    const updatedProject: Project = {
-      ...projects[projectIndex],
-      ...body,
-      updated_at: new Date().toISOString(),
+    const payload = mapProjectUpdateToSupabaseProjeto(body)
+    const { data: updatedProject, error: updateError } = await supabase
+      .from('projetos')
+      .update(payload)
+      .eq('id', Number(id))
+      .select('*')
+      .single()
+
+    if (updateError || !updatedProject) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: `Erro ao atualizar projeto no Supabase: ${updateError?.message || 'sem retorno de dados'}`,
+      })
     }
 
-    projects[projectIndex] = updatedProject
-
-    // Salva no arquivo
-    await writeFile(filePath, JSON.stringify(projects, null, 2), 'utf-8')
-
-    return updatedProject
+    return mapSupabaseProjetoToProject(updatedProject as SupabaseProjetoRow)
   } catch (error) {
     if (error && typeof error === 'object' && 'statusCode' in error) {
       throw error

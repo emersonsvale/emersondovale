@@ -1,21 +1,30 @@
-import { readFile, writeFile } from 'fs/promises'
-import { join } from 'path'
 import type { Project } from '../../shared/types/Project'
+import { mapSupabaseProjetoToProject, type SupabaseProjetoRow } from '../utils/projectMapper'
+import { getSupabaseServerClient } from '../utils/supabase'
 
 export default defineEventHandler(async (event): Promise<Project[]> => {
   try {
-    const filePath = join(process.cwd(), 'data', 'projects.json')
-    const fileContent = await readFile(filePath, 'utf-8')
-    const projects: Project[] = JSON.parse(fileContent)
-    return projects.sort((a, b) => {
-      // Ordena por featured primeiro, depois por data
-      if (a.featured && !b.featured) return -1
-      if (!a.featured && b.featured) return 1
-      const dateA = a.created_at ? new Date(a.created_at).getTime() : 0
-      const dateB = b.created_at ? new Date(b.created_at).getTime() : 0
-      return dateB - dateA
-    })
+    const supabase = getSupabaseServerClient(event)
+
+    const { data, error } = await supabase
+      .from('projetos')
+      .select('*')
+      .order('valeapps', { ascending: false })
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: `Erro ao buscar projetos no Supabase: ${error.message}`,
+      })
+    }
+
+    return (data || []).map((project) => mapSupabaseProjetoToProject(project as SupabaseProjetoRow))
   } catch (error) {
+    if (error && typeof error === 'object' && 'statusCode' in error) {
+      throw error
+    }
+
     console.error('Erro ao ler projetos:', error)
     throw createError({
       statusCode: 500,

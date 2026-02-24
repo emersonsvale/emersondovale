@@ -2,26 +2,30 @@
   <div :class="cn('', $attrs.class as string)">
     <div
       :style="{ '--duration': `${duration}s` }"
-      class="testimonials-column flex flex-col gap-6 pb-6"
+      class="testimonials-column flex flex-col gap-5 pb-5"
     >
       <template v-for="(_, index) in Array(2).fill(0)" :key="index">
         <div
           v-for="(testimonial, i) in testimonials"
           :key="`${index}-${i}`"
-          class="p-10 rounded-3xl border border-neutral-800/60 bg-[#1a1a1a] shadow-lg shadow-[#c9a962]/10 max-w-xs w-full"
+          class="relative p-7 rounded-2xl border border-white/[0.06] bg-[var(--c-surface)] max-w-xs w-full transition-colors duration-300 hover:border-[var(--c-gold)]/20"
         >
-          <div class="text-neutral-300">{{ testimonial.text }}</div>
-          <div class="flex items-center gap-2 mt-5">
+          <!-- Quote mark -->
+          <div class="absolute top-4 right-5 text-4xl font-serif text-[var(--c-gold)]/10 leading-none select-none pointer-events-none" aria-hidden="true">"</div>
+
+          <div class="text-sm leading-[1.7] text-[var(--c-text-secondary)]">{{ testimonial.text }}</div>
+          <div class="flex items-center gap-3 mt-5 pt-4 border-t border-white/[0.04]">
             <img
-              :width="40"
-              :height="40"
+              :width="36"
+              :height="36"
               :src="testimonial.image"
               :alt="testimonial.name"
-              class="h-10 w-10 rounded-full"
+              @error="onImageError"
+              class="h-9 w-9 rounded-full object-cover ring-1 ring-white/[0.06]"
             />
             <div class="flex flex-col">
-              <div class="font-medium tracking-tight leading-5 text-[#c9a962]">{{ testimonial.name }}</div>
-              <div class="leading-5 opacity-60 tracking-tight text-neutral-400">{{ testimonial.role }}</div>
+              <div class="text-sm font-semibold tracking-tight leading-5 text-white" style="font-family: var(--font-heading)">{{ testimonial.name }}</div>
+              <div class="text-xs leading-5 text-[var(--c-text-muted)] tracking-tight">{{ testimonial.role }}</div>
             </div>
           </div>
         </div>
@@ -42,6 +46,17 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   duration: 10,
 })
+
+const onImageError = (event: Event) => {
+  const element = event.target as HTMLImageElement | null
+  if (!element) return
+
+  if (!element.dataset.fallbackApplied) {
+    element.dataset.fallbackApplied = 'true'
+    const name = element.alt?.trim() || 'User'
+    element.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=1a1a1a&color=c9a962&size=160`
+  }
+}
 </script>
 
 <style scoped>

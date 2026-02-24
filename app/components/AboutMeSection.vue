@@ -2,51 +2,70 @@
   <section
     ref="sectionRef"
     id="about-me"
-    class="relative min-h-[480px] overflow-hidden bg-[#0a0a0a] py-16 md:py-24"
+    class="relative min-h-[480px] overflow-hidden bg-[var(--c-bg)] py-20 md:py-32"
     aria-labelledby="about-me-title"
   >
-    <!-- Gradiente sutil de fundo (consistente com Hero) -->
+    <!-- Subtle background glow -->
     <div
-      class="absolute inset-0 z-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,#3d2e1e_0%,transparent_60%)] opacity-70"
+      class="absolute inset-0 z-0 bg-[radial-gradient(ellipse_60%_40%_at_30%_50%,rgba(201,169,98,0.06)_0%,transparent_70%)]"
       aria-hidden="true"
     />
 
-    <!-- Layout: imagem à esquerda, texto à direita -->
     <div
-      class="relative z-10 mx-auto flex max-w-6xl flex-col items-center gap-10 px-6 md:flex-row md:items-center md:gap-12 lg:gap-16"
-      :style="{ transform: `translateY(${textParallaxY}px)` }"
+      class="relative z-10 mx-auto flex max-w-6xl flex-col items-center gap-12 px-6 md:flex-row md:items-start md:gap-16 lg:gap-20"
     >
-      <!-- Foto à esquerda -->
-      <div class="flex-shrink-0 md:w-[min(320px,40%)]">
-        <img
-          src="/image%20(2).png"
-          alt="Emerson Vale - Software Engineer"
-          class="w-full rounded-xl object-cover border-0"
-          width="320"
-          height="400"
-          loading="lazy"
-        />
+      <!-- Photo column -->
+      <div class="flex-shrink-0 w-full md:w-[min(340px,38%)]">
+        <div
+          ref="imageRef"
+          class="reveal relative"
+        >
+          <!-- Decorative frame -->
+          <div class="absolute -top-3 -left-3 h-24 w-24 border-t-2 border-l-2 border-[var(--c-gold)]/30 rounded-tl-2xl" aria-hidden="true" />
+          <div class="absolute -bottom-3 -right-3 h-24 w-24 border-b-2 border-r-2 border-[var(--c-gold)]/30 rounded-br-2xl" aria-hidden="true" />
+          <img
+            src="/image%20(2).png"
+            alt="Emerson Vale - Software Engineer"
+            class="w-full rounded-xl object-cover"
+            width="340"
+            height="420"
+            loading="lazy"
+          />
+          <!-- Subtle shine overlay -->
+          <div class="absolute inset-0 rounded-xl bg-gradient-to-tr from-transparent via-white/[0.03] to-transparent pointer-events-none" />
+        </div>
+
+        <!-- Stats row -->
+        <div class="mt-8 grid grid-cols-3 gap-3">
+          <div
+            v-for="(stat, i) in stats"
+            :key="i"
+            class="reveal text-center rounded-lg border border-white/[0.06] bg-[var(--c-surface)] p-3"
+            :style="{ transitionDelay: `${0.2 + i * 0.1}s` }"
+          >
+            <div class="text-xl font-bold text-gold-gradient" style="font-family: var(--font-heading)">{{ stat.value }}</div>
+            <div class="mt-1 text-[10px] uppercase tracking-[0.15em] text-[var(--c-text-muted)]">{{ stat.label }}</div>
+          </div>
+        </div>
       </div>
 
-      <!-- Conteúdo principal (texto à direita) -->
+      <!-- Content column -->
       <div class="flex min-w-0 flex-1 flex-col text-center md:text-left">
         <div
           ref="headerRef"
-          class="flex flex-col items-center md:items-start about-me-header"
+          class="reveal flex flex-col items-center md:items-start"
         >
-          <div class="flex justify-center md:justify-start">
-            <div class="border border-neutral-800/60 py-1 px-4 rounded-lg text-neutral-400">About Me</div>
-          </div>
+          <div class="section-label">About Me</div>
 
           <h2
             id="about-me-title"
-            class="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tighter mt-5 text-[#c9a962]"
+            class="section-heading mt-4"
           >
             {{ title }}
           </h2>
         </div>
 
-        <div class="mt-6 space-y-4 text-base leading-relaxed text-neutral-400 md:text-lg">
+        <div class="reveal mt-8 space-y-5 text-[15px] leading-[1.8] text-[var(--c-text-secondary)] md:text-base" style="transition-delay: 0.2s">
           <p
             v-for="(paragraph, i) in descriptionParagraphs"
             :key="i"
@@ -56,29 +75,34 @@
         </div>
 
         <template v-if="domainItems && domainItems.length > 0">
-          <p class="mt-8 text-sm font-medium uppercase tracking-wider text-[#c9a962]">
-            Specialist in:
-          </p>
-          <ul class="mt-3 max-w-lg list-none space-y-2 text-center text-sm text-neutral-400 md:text-left md:text-base">
-            <li
-              v-for="(item, i) in domainItems"
-              :key="i"
-            >
-              {{ item }}
-            </li>
-          </ul>
+          <div class="reveal mt-10" style="transition-delay: 0.3s">
+            <p class="section-label mb-4">
+              Specialist in
+            </p>
+            <div class="flex flex-wrap justify-center md:justify-start gap-2">
+              <span
+                v-for="(item, i) in domainItems"
+                :key="i"
+                class="inline-flex items-center rounded-full border border-white/[0.06] bg-[var(--c-surface)] px-4 py-1.5 text-xs font-medium text-[var(--c-text-secondary)] transition-colors hover:border-[var(--c-gold)]/30 hover:text-[var(--c-gold)]"
+              >
+                {{ item }}
+              </span>
+            </div>
+          </div>
         </template>
 
-        <div class="mt-10 flex justify-center md:justify-start">
+        <div class="reveal mt-10 flex justify-center md:justify-start" style="transition-delay: 0.4s">
           <a
             :href="contactHref"
-            class="inline-flex items-center justify-center rounded-full bg-[#c9a962] px-8 py-3 text-sm font-medium text-[#0a0a0a] transition hover:bg-[#d4b96d]"
+            class="group inline-flex items-center gap-3 rounded-full border border-[var(--c-gold)]/40 bg-[var(--c-gold)]/10 px-7 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-[var(--c-gold)] transition-all duration-300 hover:bg-[var(--c-gold)] hover:text-[var(--c-bg)]"
           >
             {{ contactLabel }}
+            <svg class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
           </a>
         </div>
 
-        <!-- Slot para conteúdo extra (links, badges, etc.) -->
         <div v-if="$slots.extra" class="mt-8">
           <slot name="extra" />
         </div>
@@ -92,33 +116,13 @@ import { computed, ref, onMounted, onUnmounted, nextTick } from 'vue'
 
 const sectionRef = ref<HTMLElement | null>(null)
 const headerRef = ref<HTMLElement | null>(null)
-const textParallaxY = ref(0)
+const imageRef = ref<HTMLElement | null>(null)
 
-let ticking = false
-
-function updateParallax() {
-  const rect = sectionRef.value?.getBoundingClientRect()
-  if (!rect) return
-  textParallaxY.value = rect.top * 0.12
-  ticking = false
-}
-
-function onScroll() {
-  if (!ticking) {
-    requestAnimationFrame(updateParallax)
-    ticking = true
-  }
-}
-
-function setHeaderVisible(el: HTMLElement) {
-  el.classList.add('about-me-header-visible')
-}
-
-function isInViewport(el: HTMLElement): boolean {
-  const rect = el.getBoundingClientRect()
-  const vh = window.innerHeight || document.documentElement.clientHeight
-  return rect.top < vh * 0.85 && rect.bottom > 0
-}
+const stats = [
+  { value: '5+', label: 'Years' },
+  { value: '20+', label: 'Projects' },
+  { value: '10+', label: 'Clients' },
+]
 
 const props = withDefaults(
   defineProps<{
@@ -141,47 +145,27 @@ const descriptionParagraphs = computed(() =>
   (props.description || '').split('\n\n').filter(Boolean)
 )
 
+function setupObserver() {
+  const elements = sectionRef.value?.querySelectorAll('.reveal')
+  if (!elements) return
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed')
+        }
+      })
+    },
+    { threshold: 0.05, rootMargin: '0px 0px -8% 0px' }
+  )
+
+  elements.forEach((el) => observer.observe(el))
+}
+
 onMounted(() => {
-  updateParallax()
-  window.addEventListener('scroll', onScroll, { passive: true })
-
   nextTick(() => {
-    const header = headerRef.value
-    if (!header) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setHeaderVisible(entry.target as HTMLElement)
-          }
-        })
-      },
-      { threshold: 0.05, rootMargin: '0px 0px -10% 0px' }
-    )
-    observer.observe(header)
-
-    if (isInViewport(header)) {
-      setHeaderVisible(header)
-    }
+    setupObserver()
   })
 })
-
-onUnmounted(() => {
-  window.removeEventListener('scroll', onScroll)
-})
 </script>
-
-<style scoped>
-.about-me-header {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
-  transition-delay: 0.1s;
-}
-
-.about-me-header-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-</style>

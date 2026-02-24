@@ -119,13 +119,6 @@
             </span>
           </div>
           <div class="flex flex-col gap-2">
-            <NuxtLink
-              :to="`/projects/${project.slug}`"
-              target="_blank"
-              class="w-full rounded-lg bg-[#2a2a2a] text-neutral-300 px-4 py-2 text-sm font-medium hover:bg-[#3a3a3a] transition text-center"
-            >
-              Ver Projeto
-            </NuxtLink>
             <div class="flex gap-2">
               <button
                 type="button"
@@ -331,17 +324,17 @@
                 Links
               </h3>
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label
-                    for="live_url"
+                    for="link_web"
                     class="block text-sm font-medium text-neutral-300 mb-2"
                   >
-                    URL do Projeto (Live)
+                    Link Web
                   </label>
                   <input
-                    id="live_url"
-                    v-model="formData.live_url"
+                    id="link_web"
+                    v-model="formData.link_web"
                     type="url"
                     class="w-full rounded-lg bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-2 text-neutral-200 focus:border-[#c9a962] focus:outline-none transition font-mono text-sm"
                     placeholder="https://projeto.com"
@@ -350,17 +343,33 @@
 
                 <div>
                   <label
-                    for="github_url"
+                    for="link_google"
                     class="block text-sm font-medium text-neutral-300 mb-2"
                   >
-                    URL do GitHub
+                    Google Play
                   </label>
                   <input
-                    id="github_url"
-                    v-model="formData.github_url"
+                    id="link_google"
+                    v-model="formData.link_google"
                     type="url"
                     class="w-full rounded-lg bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-2 text-neutral-200 focus:border-[#c9a962] focus:outline-none transition font-mono text-sm"
-                    placeholder="https://github.com/user/repo"
+                    placeholder="https://play.google.com/store/apps/..."
+                  />
+                </div>
+
+                <div>
+                  <label
+                    for="link_apple"
+                    class="block text-sm font-medium text-neutral-300 mb-2"
+                  >
+                    App Store
+                  </label>
+                  <input
+                    id="link_apple"
+                    v-model="formData.link_apple"
+                    type="url"
+                    class="w-full rounded-lg bg-[#0a0a0a] border border-[#2a2a2a] px-4 py-2 text-neutral-200 focus:border-[#c9a962] focus:outline-none transition font-mono text-sm"
+                    placeholder="https://apps.apple.com/app/..."
                   />
                 </div>
               </div>
@@ -502,8 +511,9 @@ const formData = ref({
   featured: false,
   content: '',
   technologies: [] as string[],
-  github_url: '',
-  live_url: '',
+  link_web: '',
+  link_google: '',
+  link_apple: '',
 })
 
 const technologiesList = computed(() => {
@@ -541,8 +551,9 @@ const openEditModal = (project: Project) => {
     featured: project.featured || false,
     content: project.content || '',
     technologies: project.technologies || [],
-    github_url: project.github_url || '',
-    live_url: project.live_url || '',
+    link_web: project.link_web || '',
+    link_google: project.link_google || '',
+    link_apple: project.link_apple || '',
   }
   technologiesInput.value = (project.technologies || []).join(', ')
   imageError.value = false
@@ -565,8 +576,9 @@ const resetForm = () => {
     featured: false,
     content: '',
     technologies: [],
-    github_url: '',
-    live_url: '',
+    link_web: '',
+    link_google: '',
+    link_apple: '',
   }
   technologiesInput.value = ''
   imageError.value = false
@@ -597,8 +609,9 @@ const saveProject = async () => {
       technologies: technologies.length > 0 ? technologies : null,
       image: formData.value.image || null,
       category: formData.value.category || null,
-      github_url: formData.value.github_url || null,
-      live_url: formData.value.live_url || null,
+      link_web: formData.value.link_web || null,
+      link_google: formData.value.link_google || null,
+      link_apple: formData.value.link_apple || null,
       content: formData.value.content || null,
     }
 
